@@ -272,7 +272,25 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
+        //切换led
+        main_btFull.setOnClickListener {
+            main_btFull.text =
+                when (main_btFull.text) {
+                    "led1" -> {
+                        gatt?.send(-4)
+                        "led2"
+                    }
+                    else -> {
+                        gatt?.send(-5)
+                        "led1"
+                    }
+                }
+        }
+        main_btFull.setOnLongClickListener {
+            gatt?.send(-6)
+            main_btFull.text = "led1"
+            true
+        }
     }
 
 

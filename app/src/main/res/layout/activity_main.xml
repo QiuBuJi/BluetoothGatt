@@ -162,4 +162,12 @@
         app:layout_constraintStart_toEndOf="@+id/main_btUp"
         app:layout_constraintTop_toTopOf="@+id/main_btUp" />
 
+    <Button
+        android:id="@+id/main_btFull"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="led1"
+        app:layout_constraintStart_toEndOf="@+id/main_btFading"
+        app:layout_constraintTop_toTopOf="@+id/main_btFading" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
