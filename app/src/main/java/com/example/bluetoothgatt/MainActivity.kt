@@ -95,6 +95,9 @@ class MainActivity : AppCompatActivity() {
         main_rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         main_rvList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
 
+        startActivity(Intent(this, ScheduleActivity::class.java))//fixme test something
+        return
+
         val filter = IntentFilter().apply {
             addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
@@ -286,10 +289,15 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         }
+        //点亮全部led
         main_btFull.setOnLongClickListener {
             gatt?.send(-6)
             main_btFull.text = "led1"
             true
+        }
+        //添加计划
+        main_btAddSchedule.setOnClickListener {
+            startActivity(Intent(this, ScheduleActivity::class.java))
         }
     }
 
