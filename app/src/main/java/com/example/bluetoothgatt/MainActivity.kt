@@ -96,7 +96,6 @@ class MainActivity : AppCompatActivity() {
         main_rvList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
 
         startActivity(Intent(this, ScheduleActivity::class.java))//fixme test something
-        return
 
         val filter = IntentFilter().apply {
             addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -111,10 +110,12 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
+        //保持蓝牙开启状态
         if (!mBluetoothAdapter.isEnabled)
             if (!mBluetoothAdapter.enable()) toast("bluetooth open failed!")
 
-        if (mBluetoothAdapter.isEnabled && main_btOpen.text == "open") main_btOpen.performClick()
+        //显示软件，就开启Gatt设备
+//        if (mBluetoothAdapter.isEnabled && main_btOpen.text == "open") main_btOpen.performClick()
     }
 
     override fun onStop() {
