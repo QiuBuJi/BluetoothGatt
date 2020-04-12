@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,7 +25,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.OutputStream
 import java.util.*
 
 const val TAG = "msg"
@@ -32,7 +32,7 @@ const val TAG = "msg"
 class MainActivity : AppCompatActivity() {
     private val UUID_SERVICE = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb") //服务UUID
     private val UUID_RW = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb") //读写UUID
-    private val addr_mr_wus_blue = "D5:3D:7C:DC:A3:EF"
+    private val ADDRESS_SPECIFIED = "D5:3D:7C:DC:A3:EF"
 
     private val UUID_NOTIFY = UUID.fromString("00006a02-0000-1000-8000-00805f9b34fb") //订阅通知的UUID
     private val UUID_NOTIFY_DESCRIPTOR =
@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     val data = ArrayList<BluetoothDevice>()
     var mIndex = 0
     lateinit var mBluetoothAdapter: BluetoothAdapter
-    var out: OutputStream? = null
     var gatt: BluetoothGatt? = null
     lateinit var adapter: Adapter
     private val scanCallback = object : ScanCallback() {
@@ -76,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     @ExperimentalUnsignedTypes
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +95,11 @@ class MainActivity : AppCompatActivity() {
         main_rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         main_rvList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
 
-        startActivity(Intent(this, ScheduleActivity::class.java))//fixme test something
+//        startActivity(Intent(this, ScheduleActivity::class.java))//fixme test something
+
+
+//        if (!ScheduleService.isRunning)
+//            startForegroundService(Intent(this, ScheduleService::class.java))
 
         val filter = IntentFilter().apply {
             addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -111,12 +115,20 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         //保持蓝牙开启状态
-        if (!mBluetoothAdapter.isEnabled)
-            if (!mBluetoothAdapter.enable()) toast("bluetooth open failed!")
+        if (!mBluetoothAdapter.isEnabled) if (!mBluetoothAdapter.enable()) toast("bluetooth open failed!")
 
         //显示软件，就开启Gatt设备
-//        if (mBluetoothAdapter.isEnabled && main_btOpen.text == "open") main_btOpen.performClick()
+        if (mBluetoothAdapter.isEnabled && main_btOpen.text == "open") main_btOpen.performClick()
+
+        //开启定时服务
+        if (!ScheduleService.isRunning) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startForegroundService(Intent(this, ScheduleService::class.java))
+            else
+                startService(Intent(this, ScheduleService::class.java))
+        }
     }
+
 
     override fun onStop() {
         super.onStop()
@@ -126,13 +138,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     //初始化LE设备
     private fun bluetoothInit() {
 
         //打开|关闭GATT
         main_btOpen.setOnClickListener {
             val device =
-                if (mIndex >= data.size) mBluetoothAdapter.getRemoteDevice(addr_mr_wus_blue)
+                if (mIndex >= data.size) mBluetoothAdapter.getRemoteDevice(ADDRESS_SPECIFIED)
                 else data[mIndex]
             main_tvTitle.text = device.name
             main_btOpen.setTextColor(Color.BLACK)
@@ -313,6 +326,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    var mBytes: ByteArray? = null
+
     /**发送字节数组*/
     private fun BluetoothGatt.send(vararg bytes: Byte) {
         val service = getService(UUID_SERVICE)
@@ -324,15 +339,25 @@ class MainActivity : AppCompatActivity() {
         val sb = StringBuffer()
         for (byte in bytes) sb.append("$byte ")
 
-        service.getCharacteristic(UUID_RW)?.run {
-            value = bytes
-            setCharacteristicNotification(this, true)
-            outMsg("$sb ${if (writeCharacteristic(this)) "" else "write failed!"}")
+        for (i in 1..2) {
+            val chara = service.getCharacteristic(UUID_RW)
+            if (chara != null) {
+                chara.value = bytes
+                setCharacteristicNotification(chara, true)
+                val isWrite = writeCharacteristic(chara)
+                val format = bytes[0].toInt().format()
+                outMsg("write: $format ${if (isWrite) "√" else "×"} $i time")
+                if (isWrite) {
+                    chara.getDescriptor(UUID_NOTIFY_DESCRIPTOR)?.run {
+                        chara.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        Log.d(TAG, "send: writeDescriptor = ${writeDescriptor(this)}");
+                    }
+                    mBytes = bytes
+                    break
+                }
 
-            getDescriptor(UUID_NOTIFY_DESCRIPTOR)?.run {
-                value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                Log.d(TAG, "send: writeDescriptor = ${writeDescriptor(this)}");
             }
+
         }
     }
 
@@ -356,9 +381,14 @@ class MainActivity : AppCompatActivity() {
     private val gattCallback = object : BluetoothGattCallback() {
 
         override fun onCharacteristicChanged(
-            gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?
+            gatt: BluetoothGatt?, chara: BluetoothGattCharacteristic?
         ) {
-            characteristic?.run {
+            chara?.run {
+                mBytes?.run {
+                    if (this.contentEquals(value)) {
+                        toast("match!")
+                    }
+                }
                 for (byte in value) outMsg("feedback: $byte")
             }
         }
@@ -398,21 +428,30 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+
+    private fun Int.format(): String {
+        val strInt = this.toString()
+        return if (strInt.length < 2) "0$strInt" else strInt
+    }
 
 
     var count = 0
     fun outMsg(msg: String) {
         count++
         runOnUiThread {
-            main_tvLog.text = "$count.$msg\n${main_tvLog.text}"
+            val format = count.format()
+            main_tvLog.text = "$format. $msg\n${main_tvLog.text}"
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(broadcastReceiver)
     }
+
 
     /**适配器*/
     inner class Adapter(private val context: Context) : RecyclerView.Adapter<Holder>() {
@@ -437,10 +476,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     /**持有者*/
     class Holder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.sample_tvTitle)
         val uuid: TextView = itemView.findViewById(R.id.sample_tvUuid)
     }
+
 
 }

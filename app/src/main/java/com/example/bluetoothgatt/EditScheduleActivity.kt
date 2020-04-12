@@ -1,6 +1,9 @@
 package com.example.bluetoothgatt
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -12,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_edit_schedule.*
-import kotlinx.android.synthetic.main.activity_schedule.*
 import java.util.*
 
 class EditScheduleActivity : AppCompatActivity() {

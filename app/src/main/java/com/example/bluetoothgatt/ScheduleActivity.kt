@@ -1,7 +1,10 @@
 package com.example.bluetoothgatt
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -9,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +24,10 @@ class ScheduleActivity : AppCompatActivity() {
 
     private lateinit var adapter: RecyclerView.Adapter<Holder>
     private val mSchedules = ArrayList<TimeItem>()
+    lateinit var pendingIntent: PendingIntent
+    lateinit var alarm: AlarmManager
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule)
@@ -42,6 +49,32 @@ class ScheduleActivity : AppCompatActivity() {
         schedule_fabAdd.setOnClickListener {
 
         }
+
+
+
+//        alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager//todo add alarm function
+////        val intent = Intent(this, TimerReceiver::class.java)
+//        val intent = Intent(this, EditScheduleActivity::class.java)
+//        pendingIntent =
+//            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+////        alarm.setRepeating(AlarmManager.RTC, 2000, 4000, pendingIntent)
+//        alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 5000, pendingIntent)
+
+
+//        val alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//        val intent = Intent(this, ScheduleReceiver::class.java)
+//        val pendingIntent =
+//            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+//        alarm.set(AlarmManager.RTC_WAKEUP, 1000, pendingIntent)
+
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+//        alarm.cancel(pendingIntent)
+//        Log.d(TAG, "onDestroy: alarm cancel")
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,7 +95,8 @@ class ScheduleActivity : AppCompatActivity() {
     class Adapter(private val mSchedules: ArrayList<TimeItem>, private val context: Context) :
         RecyclerView.Adapter<Holder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-            val view = LayoutInflater.from(context).inflate(R.layout.sample_item_time, parent, false)
+            val view =
+                LayoutInflater.from(context).inflate(R.layout.sample_item_time, parent, false)
             return Holder(view)
         }
 
