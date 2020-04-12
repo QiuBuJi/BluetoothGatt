@@ -5,10 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +23,12 @@ class EditScheduleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_schedule)
 
+        //显示返回按钮
+        supportActionBar?.run {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         mItems.add(ItemData("Time", "00:00", true))
         mItems.add(ItemData("Window", "up", true))
         mItems.add(ItemData("Led", "1", true))
@@ -38,6 +41,16 @@ class EditScheduleActivity : AppCompatActivity() {
         edit_schedule_rvList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.run {
+            //返回
+            if (itemId == android.R.id.home) finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menu?.run {

@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -32,6 +29,12 @@ class ScheduleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule)
 
+        //显示返回按钮
+        supportActionBar?.run {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         //fixme test
         mSchedules.add(TimeItem("00:00:11", "tomorrow", true))
         mSchedules.add(TimeItem("00:11:11", "today", false))
@@ -49,7 +52,6 @@ class ScheduleActivity : AppCompatActivity() {
         schedule_fabAdd.setOnClickListener {
 
         }
-
 
 
 //        alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager//todo add alarm function
@@ -70,6 +72,16 @@ class ScheduleActivity : AppCompatActivity() {
 
     }
 
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.run {
+            //返回
+            if (itemId == android.R.id.home) finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
 //        alarm.cancel(pendingIntent)
@@ -80,6 +92,7 @@ class ScheduleActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menu?.run {
             title = "Schedule"
+
         }
         return super.onCreateOptionsMenu(menu)
     }
