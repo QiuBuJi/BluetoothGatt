@@ -19,11 +19,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_rvList"
-        android:layout_width="0dp"
-        android:layout_height="130dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="416dp"
+        android:layout_height="147dp"
         android:background="#FFFFFF"
         android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -98,30 +95,6 @@
         app:layout_constraintStart_toStartOf="@+id/linearLayout"
         app:layout_constraintTop_toTopOf="@+id/main_tvTitle" />
 
-    <TextView
-        android:id="@+id/main_tvLog"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:fadeScrollbars="true"
-        android:fadingEdge="vertical"
-        android:hint="no message..."
-        android:inputType="textMultiLine"
-        android:scrollbarStyle="insideInset"
-        android:scrollbars="vertical"
-        android:singleLine="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_sbSeek">
-
-
-    </TextView>
-
     <Button
         android:id="@+id/main_btUp"
         android:layout_width="wrap_content"
@@ -155,7 +128,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:max="50"
-        android:progress="1"
+        android:progress="25"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_btSend" />
@@ -175,5 +148,36 @@
         android:text="led1"
         app:layout_constraintStart_toEndOf="@+id/main_btFading"
         app:layout_constraintTop_toTopOf="@+id/main_btFading" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/main_rvList"
+        app:layout_constraintStart_toStartOf="@+id/main_rvList"
+        app:layout_constraintTop_toBottomOf="@+id/main_sbSeek">
+
+        <TextView
+            android:id="@+id/main_tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:fadeScrollbars="true"
+            android:fadingEdge="vertical"
+            android:hint="no message..."
+            android:inputType="textMultiLine"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical"
+            android:singleLine="false">
+
+
+        </TextView>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

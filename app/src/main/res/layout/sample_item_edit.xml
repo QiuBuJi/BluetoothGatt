@@ -28,8 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_weight="1"
         android:text="Time"
         android:textColor="#000000"
@@ -42,12 +42,10 @@
         android:id="@+id/view"
         android:layout_width="0dp"
         android:layout_height="1px"
-        android:layout_marginTop="8dp"
         android:background="@drawable/ic_bg_line_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="@+id/item_edit_tvTitle"
-        app:layout_constraintTop_toBottomOf="@+id/item_edit_tvTitle" />
+        app:layout_constraintStart_toStartOf="@+id/item_edit_tvTitle" />
 
     <Switch
         android:id="@+id/item_edit_swEnable"

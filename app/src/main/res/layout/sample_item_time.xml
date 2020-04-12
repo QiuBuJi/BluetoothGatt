@@ -8,6 +8,15 @@
     android:background="@drawable/ic_bg_ripple_item"
     android:clickable="true">
 
+    <View
+        android:id="@+id/view2"
+        android:layout_width="0dp"
+        android:layout_height="1px"
+        android:background="@drawable/ic_bg_line_black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/item_swOpen"
+        app:layout_constraintStart_toStartOf="@+id/item_tvTips" />
+
     <Switch
         android:id="@+id/item_swOpen"
         android:layout_width="wrap_content"
