@@ -13,7 +13,6 @@ import androidx.core.app.NotificationCompat
 class ScheduleService : Service() {
 
     companion object {
-        var isRunning = false
         var count: Int = 0
         var stopCount = false
     }
@@ -23,8 +22,17 @@ class ScheduleService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        isRunning = true
-        Log.d(TAG, "onCreate")
+        Log.d(TAG, "Service onCreate")
+
+        startForegroundService()
+
+        Thread {
+            while (true) {
+                count++
+                Log.d(TAG, "schedule service: $count")
+                Thread.sleep(1000)
+            }
+        }.start()
     }
 
 
@@ -55,7 +63,7 @@ class ScheduleService : Service() {
     private fun channel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importanceLow = NotificationManager.IMPORTANCE_NONE
-            val channel = NotificationChannel(NOTIFICATION_ID, "fuck you", importanceLow)
+            val channel = NotificationChannel(NOTIFICATION_ID, "Schedule", importanceLow)
                 .apply {
                     enableLights(true)
                     lightColor = Color.BLUE
@@ -69,33 +77,32 @@ class ScheduleService : Service() {
 
 
     override fun onBind(intent: Intent?): IBinder? {
-        Log.d(TAG, "onBind")
+        Log.d(TAG, "Service onBind")
+
+
         return null
     }
 
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d(TAG, "onStartCommand: ")
+        Log.d(TAG, "Service onStartCommand: ")
 
-//        val intent1 = Intent(this, EditScheduleActivity::class.java)
-//        intent1.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//        startActivity(intent1)
-        startForegroundService()
+        val mainIntent = Intent(this, ScheduleActivity::class.java)
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(mainIntent)
+            Log.d(TAG, "onReceive: start activity")
+        } catch (e: Exception) {
+            Log.d(TAG, "onReceive: startActivity error!")
+            e.printStackTrace()
+        }
 
-        Thread {
-            while (true) {
-                count++
-                Log.d(TAG, "onStartCommand: $count")
-                Thread.sleep(1000)
-            }
-        }.start()
         return START_STICKY
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        isRunning = false
-        Log.d(TAG, "onDestroy")
+        Log.d(TAG, "Service onDestroy")
     }
 }

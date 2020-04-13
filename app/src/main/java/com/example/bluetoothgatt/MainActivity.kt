@@ -5,14 +5,12 @@ import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -74,12 +72,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+    lateinit var serviceConn: ServiceConn
 
     @ExperimentalUnsignedTypes
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Log.d(TAG, "onCreate: MainActivity Started!")
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         requestPermissions(
@@ -108,6 +108,14 @@ class MainActivity : AppCompatActivity() {
         }
         registerReceiver(broadcastReceiver, filter)
         bluetoothInit()
+
+
+        //开启定时服务
+        val intent = Intent(this, ScheduleService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent)
+        else startService(intent)
+        serviceConn = ServiceConn()
+        bindService(intent, serviceConn, Context.BIND_AUTO_CREATE)
     }
 
 
@@ -120,15 +128,17 @@ class MainActivity : AppCompatActivity() {
         //显示软件，就开启Gatt设备
         if (mBluetoothAdapter.isEnabled && main_btOpen.text == "open") main_btOpen.performClick()
 
-        //开启定时服务
-        if (!ScheduleService.isRunning) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                startForegroundService(Intent(this, ScheduleService::class.java))
-            else
-                startService(Intent(this, ScheduleService::class.java))
-        }
     }
 
+    class ServiceConn : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+
+        }
+
+    }
 
     override fun onStop() {
         super.onStop()
@@ -450,6 +460,9 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(broadcastReceiver)
+        unbindService(serviceConn)
+
+        Log.d(TAG, "onDestroy: ")
     }
 
 
